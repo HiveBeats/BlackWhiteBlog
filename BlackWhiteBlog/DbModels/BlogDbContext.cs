@@ -25,7 +25,7 @@ namespace BlackWhiteBlog.DbModels
             modelBuilder.Entity<Post>(post =>
             {
                 post.HasKey(p => p.PostId);
-                post.Property(p => p.PostTitle).IsRequired().HasMaxLength(256);
+               
                 post.HasIndex(p => p.PostDate);
                 post.HasMany<PostContent>()
                     .WithOne(pc => pc.Post);
@@ -33,9 +33,10 @@ namespace BlackWhiteBlog.DbModels
             
             modelBuilder.Entity<PostContent>(postContent =>
             {
+                postContent.Property(pc => pc.Title).IsRequired().HasMaxLength(1000);
                 postContent.Property(pc => pc.Content).HasColumnType("text").IsRequired();
                 postContent.Property(pc => pc.PostColor).IsRequired();
-                postContent.HasIndex(pc => pc.PostId);
+                postContent.HasIndex(pc => pc.PostColor);
             });
 
             modelBuilder.Entity<User>(user =>
