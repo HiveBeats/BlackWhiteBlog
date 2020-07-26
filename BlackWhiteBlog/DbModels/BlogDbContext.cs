@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlackWhiteBlog.DbModels
@@ -35,6 +36,16 @@ namespace BlackWhiteBlog.DbModels
                 postContent.Property(pc => pc.Content).HasColumnType("text").IsRequired();
                 postContent.Property(pc => pc.PostColor).IsRequired();
                 postContent.HasIndex(pc => pc.PostId);
+            });
+
+            modelBuilder.Entity<User>(user =>
+            {
+                user.HasKey(u => u.UserId);
+                user.Property(u => u.UserName).IsRequired();
+                user.Property(u => u.HashedPassword).IsRequired();
+                user.HasIndex(u => u.UserName).IsUnique();
+                user.HasIndex(u => new {u.UserName, u.HashedPassword});
+                user.HasOne<Author>();
             });
 
         }
