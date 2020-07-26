@@ -1,6 +1,4 @@
-using System.Runtime.CompilerServices;
-
-namespace BlackWhiteBlog.TransferObjects
+namespace BlackWhiteBlog.TransferObjects.User
 {
     public class LoginDto
     {

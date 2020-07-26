@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BlackWhiteBlog.DbModels;
 using BlackWhiteBlog.TransferObjects;
+using BlackWhiteBlog.TransferObjects.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlackWhiteBlog.Services

@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlackWhiteBlog.Helpers.Paging
 {
     public static class PagedResultExtensions
     {
-        public static PagedResult<T> GetPaged<T>(this IQueryable<T> query, 
+        public static async Task<PagedResult<T>> GetPaged<T>(this IQueryable<T> query, 
             int page, int pageSize) where T : class
         {
             var result = new PagedResult<T>();
@@ -18,7 +20,7 @@ namespace BlackWhiteBlog.Helpers.Paging
             result.PageCount = (int)Math.Ceiling(pageCount);
  
             var skip = (page - 1) * pageSize;     
-            result.Results = query.Skip(skip).Take(pageSize).ToList();
+            result.Results = await query.Skip(skip).Take(pageSize).ToListAsync();
  
             return result;
         }

@@ -1,4 +1,4 @@
-namespace BlackWhiteBlog.TransferObjects
+namespace BlackWhiteBlog.TransferObjects.User
 {
     public class RegisterUserDto
     {
