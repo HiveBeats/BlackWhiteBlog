@@ -1,0 +1,42 @@
+using Microsoft.EntityFrameworkCore;
+
+namespace BlackWhiteBlog.DbModels
+{
+    public class BlogDbContext : DbContext
+    {
+        public DbSet<Author> Authors { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<PostContent> PostContents { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Author>(author =>
+            {
+                author.HasKey(e => e.AuthorId);
+                author.Property(e => e.AuthorName).IsRequired();
+                author.Property(e => e.AuthorDesc).HasColumnType("text");
+                author.HasMany<Post>()
+                    .WithOne(p => p.Author);
+            });
+
+            modelBuilder.Entity<Post>(post =>
+            {
+                post.HasKey(p => p.PostId);
+                post.Property(p => p.PostTitle).IsRequired().HasMaxLength(256);
+                post.HasIndex(p => p.PostDate);
+                post.HasMany<PostContent>()
+                    .WithOne(pc => pc.Post);
+            });
+            
+            modelBuilder.Entity<PostContent>(postContent =>
+            {
+                postContent.Property(pc => pc.Content).HasColumnType("text").IsRequired();
+                postContent.Property(pc => pc.PostColor).IsRequired();
+                postContent.HasIndex(pc => pc.PostId);
+            });
+
+        }
+    }
+}
