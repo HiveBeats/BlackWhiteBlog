@@ -1,6 +1,6 @@
 using System;
 
-namespace BlackWhiteBlog.Helpers
+namespace BlackWhiteBlog.Helpers.Paging
 {
     public class PagedResultBase
     {

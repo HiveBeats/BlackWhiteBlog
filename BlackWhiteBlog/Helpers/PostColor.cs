@@ -1,4 +1,4 @@
-namespace BlackWhiteBlog.DbModels
+namespace BlackWhiteBlog.Helpers
 {
     public enum PostColor
     {

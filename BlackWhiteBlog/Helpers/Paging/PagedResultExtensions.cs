@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace BlackWhiteBlog.Helpers
+namespace BlackWhiteBlog.Helpers.Paging
 {
     public static class PagedResultExtensions
     {

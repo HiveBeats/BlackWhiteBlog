@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace BlackWhiteBlog.Helpers
+namespace BlackWhiteBlog.Helpers.Paging
 {
     public class PagedResult<T> : PagedResultBase where T : class
     {

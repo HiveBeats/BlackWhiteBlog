@@ -8,7 +8,7 @@ namespace BlackWhiteBlog.DbModels
         public DbSet<Author> Authors { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostContent> PostContents { get; set; }
-
+        public DbSet<User> Users { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
