@@ -29,8 +29,9 @@ namespace BlackWhiteBlog
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            var connectionString = Configuration.GetConnectionString("BlogDb");
             services.AddDbContext<BlogDbContext>(options =>
-                options.UseMySQL(Configuration.GetConnectionString("BloggingDatabase")));
+                options.UseMySQL(connectionString));
             services.AddScoped<IUserService, UserService>();
         }
 

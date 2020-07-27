@@ -71,7 +71,7 @@ namespace BlackWhiteBlog.Controllers.Posts
         }
         
         // GET: api/Posts/5/1
-        [HttpGet("{id}/{color}", Name = "Get")]
+        [HttpGet("{id}/{color}", Name = "GetPost")]
         public async Task<IActionResult> Get(int id, int color)
         {
             var post = await _ctx.Posts

@@ -1,0 +1,56 @@
+[PagingDto]
+{
+  "currentPage": 0,
+  "pageSize": 0
+}
+
+[PostContentDto]
+{
+  "title": null,
+  "picLink": null,
+  "htmlContent": null,
+  "color": 0,
+  "userId": null,
+  "authorId": null
+}
+
+[CreatePostDto]
+{
+  "contents": [{//PostContentDto
+      "title": null,
+      "picLink": null,  
+      "htmlContent": null,
+      "color": 0,
+      "userId": null,
+      "authorId": null
+      }],
+  "userId": null,
+  "authorId": null
+}
+
+[GetPostsDto]
+{
+  "postColor": 0,
+  "currentPage": 0,
+  "pageSize": 0
+}
+
+[FullPostDto]
+{
+  "postId": 0,
+  "authorId": 0,
+  "authorName": null,
+  "title": null,
+  "picLink": null,
+  "postDate": "0001-01-01T00:00:00",
+  "htmlContent": null
+}
+
+[PostCardDto]
+{
+  "postId": 0,
+  "title": null,
+  "picLink": null,
+  "postDate": "0001-01-01T00:00:00",
+  "textContent": null
+}

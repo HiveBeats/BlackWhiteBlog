@@ -48,7 +48,7 @@ namespace BlackWhiteBlog.Controllers.Users
         }
 
         // GET: api/Users
-        [HttpGet("{id}", Name = "Get")]
+        [HttpGet("{id}", Name = "GetUser")]
         public async Task<IActionResult> Get(int id, [FromBody] UserRequestDto value)
         {
             var privMessage = await CheckPriv(value);
