@@ -15,10 +15,7 @@ namespace BlackWhiteBlog.Controllers.Users
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
-    {
-        
-        //todo: put метод для редактирования пользователя(смена имени, смена прав)
-        
+    {   
         private readonly IUserService _userService;
         private readonly BlogDbContext _ctx;
         public UserController(BlogDbContext ctx, IUserService userService)
@@ -109,6 +106,29 @@ namespace BlackWhiteBlog.Controllers.Users
             }
         }
 
+        //PUT: api/Users/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] EditUserDto value)
+        {
+            // метод для редактирования пользователя(смена имени, смена прав)
+            var privMessage = await CheckPriv(value);
+            if (!string.IsNullOrEmpty(privMessage))
+                return BadRequest(privMessage);
+
+            var user = await _ctx.Users
+                .FirstOrDefaultAsync(u => u.UserId == id);
+            if (user == null)
+                return BadRequest("Пользователь не найден");
+            
+            user.UserName = value.EditedUserName;
+            user.Privs = value.EditedUserPrivs;
+            var result = await _ctx.SaveChangesAsync();
+            
+            if (result > 0)
+                return Ok();
+            return BadRequest($"Не удалось отредактировать пользователя {user.UserName}");
+        }
+        
         private async Task<string> CheckPriv(UserRequestDto value)
         {
             if (value is null)
