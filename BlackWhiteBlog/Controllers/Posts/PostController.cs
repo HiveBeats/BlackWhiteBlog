@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AngleSharp;
 using BlackWhiteBlog.DbModels;
 using BlackWhiteBlog.Helpers.Paging;
+using BlackWhiteBlog.Helpers.Permissions;
 using BlackWhiteBlog.TransferObjects.Post;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -102,7 +103,10 @@ namespace BlackWhiteBlog.Controllers.Posts
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CreatePostDto value)
         {
-            //todo: проверка прав юзера
+            //проверка прав юзера
+            var user = await _ctx.Users.FirstOrDefaultAsync(u => u.UserId == value.UserId);
+            if (user == null || user.Privs < (int)UserPermission.AddPost)
+                return BadRequest("Недостаточно прав для добавления поста");
             
             var author = await _ctx.Authors
                 .FirstOrDefaultAsync(x => x.AuthorId == value.AuthorId);
@@ -141,13 +145,22 @@ namespace BlackWhiteBlog.Controllers.Posts
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody]PostContentDto value)
         {
-            //todo: проверка прав юзера
+            //проверка прав юзера
+            var user = await _ctx.Users.FirstOrDefaultAsync(u => u.UserId == value.UserId);
+            if (user == null || user.Privs < (int)UserPermission.EditOtherPosts)
+                return BadRequest("Недостаточно прав для редактирования поста");
             
             //находим контент поста с таким цветом
             var postContent = await _ctx.PostContents
+                .Include(pc => pc.Post)
                 .FirstOrDefaultAsync(pc => pc.PostId == id && pc.PostColor == value.Color);
             if (postContent == null)
                 return NotFound("Пост не найден");
+            
+            //проверяем, если это чужой пост, можем ли мы его редактировать
+            var isOtherAuthor = postContent.Post.AuthorId != value.AuthorId;
+            if (isOtherAuthor && user.Privs < (int)UserPermission.ManagePosts)
+                return BadRequest("Недостаточно прав для редактирования чужих постов");
             
             //обновляем контент
             postContent.Content = value.HtmlContent;
