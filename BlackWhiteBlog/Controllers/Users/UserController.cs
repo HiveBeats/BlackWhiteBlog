@@ -136,6 +136,10 @@ namespace BlackWhiteBlog.Controllers.Users
 
             var currentUser = await _ctx.Users
                 .FirstOrDefaultAsync(u => u.UserId == value.UserId);
+            
+            if (currentUser == null)
+                return "Невозможно определить права для текущего пользователя";
+            
             if (currentUser.Privs < (int) UserPermission.ManageUsers)
                 return "Недостаточно прав для редактирования пользователей";
 
