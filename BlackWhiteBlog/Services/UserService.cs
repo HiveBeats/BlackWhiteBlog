@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlackWhiteBlog.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly BlogDbContext _ctx;
         public UserService(BlogDbContext ctx)
@@ -75,7 +75,6 @@ namespace BlackWhiteBlog.Services
             };
             await _ctx.Authors.AddAsync(author);
             user.Author = author;
-            
             //save changes in db
             await _ctx.SaveChangesAsync();
 

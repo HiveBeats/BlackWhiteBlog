@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BlackWhiteBlog.DbModels;
+using BlackWhiteBlog.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -30,6 +31,7 @@ namespace BlackWhiteBlog
             services.AddControllers();
             services.AddDbContext<BlogDbContext>(options =>
                 options.UseMySQL(Configuration.GetConnectionString("BloggingDatabase")));
+            services.AddScoped<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
