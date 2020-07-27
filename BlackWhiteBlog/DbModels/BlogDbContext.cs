@@ -5,6 +5,10 @@ namespace BlackWhiteBlog.DbModels
 {
     public class BlogDbContext : DbContext
     {
+        public BlogDbContext()
+        {
+            Database.EnsureCreated();
+        }
         public DbSet<Author> Authors { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostContent> PostContents { get; set; }
