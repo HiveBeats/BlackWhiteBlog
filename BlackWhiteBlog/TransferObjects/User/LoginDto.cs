@@ -21,6 +21,7 @@ namespace BlackWhiteBlog.TransferObjects.User
                 UserName = dto.UserName,
                 UserPassword = dto.Password
             };
+            LoginDto = loginDto;
         }
 
         public LoginDto LoginDto { get; private set; }

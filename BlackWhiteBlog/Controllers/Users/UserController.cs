@@ -63,7 +63,7 @@ namespace BlackWhiteBlog.Controllers.Users
             
             var result = new UserDetailDto()
              {
-                 AuthorId = userInfo.AuthorId,
+                 AuthorId = (int)userInfo.AuthorId,
                  AuthorName = userInfo.Author.AuthorName,
                  AuthorPicLink = userInfo.Author.AuthorPicLink,
                  Privs = userInfo.Privs,
