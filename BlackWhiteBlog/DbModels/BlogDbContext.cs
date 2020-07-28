@@ -26,24 +26,26 @@ namespace BlackWhiteBlog.DbModels
             modelBuilder.Entity<User>(user =>
             {
                 user.HasKey(u => u.UserId);
-                user.Property(u => u.UserName).IsRequired();
-                user.Property(u => u.HashedPassword).IsRequired();
+                user.Property(u => u.UserName).IsRequired().HasMaxLength(50);
+                user.Property(u => u.HashedPassword).IsRequired().HasMaxLength(256);
                 user.HasIndex(u => u.UserName).IsUnique();
                 user.HasIndex(u => new {u.UserName, u.HashedPassword});
+                
                 user.HasOne(u => u.Author)
                     .WithOne(a => a.User)
-                    .HasForeignKey<Author>(u => u.AuthorId);
+                    .HasForeignKey<User>(u => u.AuthorId);
             });
             
             modelBuilder.Entity<Author>(author =>
             {
                 author.HasKey(e => e.AuthorId);
-                author.Property(e => e.AuthorName).IsRequired();
+                author.Property(e => e.AuthorName).IsRequired().HasMaxLength(256);
+                author.Property(a => a.AuthorPicLink).HasMaxLength(256);
                 author.Property(e => e.AuthorDesc).HasColumnType("text");
-                
+
                 author.HasOne(a => a.User)
-                    .WithOne(u => u.Author)
-                    .HasForeignKey<User>(u => u.UserId);
+                      .WithOne(u => u.Author)
+                      .HasForeignKey<Author>(a => a.UserId);
                 
                 author.HasMany<Post>()
                     .WithOne(p => p.Author)
@@ -55,18 +57,31 @@ namespace BlackWhiteBlog.DbModels
                 post.HasKey(p => p.PostId);
                
                 post.HasIndex(p => p.PostDate);
-                post.HasMany<PostContent>()
-                    .WithOne(pc => pc.Post)
-                    .HasForeignKey(pc => pc.PostId);
+                //?
+                post.HasOne(pc => pc.Author)
+                    .WithMany(a => a.Posts)
+                    .HasForeignKey(a => a.AuthorId);
+
+                /*post.HasMany(p => p.PostContents)
+                    .WithOne(pc => pc.Post);*/
             });
             
             modelBuilder.Entity<PostContent>(postContent =>
             {
-                postContent.Property(pc => pc.Title).IsRequired().HasMaxLength(1000);
-                postContent.Property(pc => pc.Content).HasColumnType("text").IsRequired();
+                postContent.Property(pc => pc.Title).IsRequired().HasMaxLength(256);
+                postContent.Property(pc => pc.Content).HasColumnType("longtext").IsRequired();
+                postContent.Property(pc => pc.ImageLink).HasMaxLength(256);
                 postContent.Property(pc => pc.PostColor).IsRequired();
                 postContent.HasIndex(pc => pc.PostColor);
-                postContent.HasKey(pc => new {pc.PostId, pc.PostColor});
+                postContent.HasIndex(pc => new {pc.PostId, pc.PostColor}).IsUnique();
+
+                postContent.HasOne(pc => pc.Post)
+                           .WithMany(p => p.PostContents);
+                /*
+                postContent.HasOne<Post>()
+                    .WithMany(p => p.PostContents)
+                    .HasForeignKey(p => p.PostId);
+                    */
             });
 
            
