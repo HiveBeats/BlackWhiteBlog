@@ -13,6 +13,7 @@ namespace BlackWhiteBlog.DbModels
         public BlogDbContext(DbContextOptions<BlogDbContext> options)
             : base(options)
         {
+            Database.EnsureDeleted();
             Database.EnsureCreated();
         }
         public DbSet<Author> Authors { get; set; }
@@ -43,9 +44,9 @@ namespace BlackWhiteBlog.DbModels
                 author.Property(a => a.AuthorPicLink).HasMaxLength(256);
                 author.Property(e => e.AuthorDesc).HasColumnType("text");
 
-                author.HasOne(a => a.User)
+                /*author.HasOne(a => a.User)
                       .WithOne(u => u.Author)
-                      .HasForeignKey<Author>(a => a.UserId);
+                      .HasForeignKey<Author>(a => a.UserId);*/
                 
                 author.HasMany<Post>()
                     .WithOne(p => p.Author)
