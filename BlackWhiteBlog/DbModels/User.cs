@@ -8,7 +8,7 @@ namespace BlackWhiteBlog.DbModels
         public string Token { get; set; }
         public int Privs { get; set; }
         
-        public int AuthorId { get; set; }
-        public Author Author { get; set; }
+        public int? AuthorId { get; set; }
+        public virtual Author Author { get; set; }
     }
 }
