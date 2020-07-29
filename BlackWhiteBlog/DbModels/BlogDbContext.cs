@@ -13,7 +13,6 @@ namespace BlackWhiteBlog.DbModels
         public BlogDbContext(DbContextOptions<BlogDbContext> options)
             : base(options)
         {
-            Database.EnsureDeleted();
             Database.EnsureCreated();
         }
         public DbSet<Author> Authors { get; set; }
