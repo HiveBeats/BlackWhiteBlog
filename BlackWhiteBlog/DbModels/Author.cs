@@ -9,6 +9,9 @@ namespace BlackWhiteBlog.DbModels
         public string AuthorName { get; set; }
         public string AuthorPicLink { get; set; }
         public string AuthorDesc { get; set; }
-        private ICollection<Post> Posts { get; set; }
+        
+        public int UserId { get; set; }
+        public User User { get; set; }
+        public ICollection<Post> Posts { get; set; }
     }
 }

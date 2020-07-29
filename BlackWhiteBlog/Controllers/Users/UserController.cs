@@ -48,7 +48,7 @@ namespace BlackWhiteBlog.Controllers.Users
         }
 
         // GET: api/Users
-        [HttpGet("{id}", Name = "Get")]
+        [HttpGet("{id}", Name = "GetUser")]
         public async Task<IActionResult> Get(int id, [FromBody] UserRequestDto value)
         {
             var privMessage = await CheckPriv(value);
@@ -63,7 +63,7 @@ namespace BlackWhiteBlog.Controllers.Users
             
             var result = new UserDetailDto()
              {
-                 AuthorId = userInfo.AuthorId ?? -1,
+                 AuthorId = (int)userInfo.AuthorId,
                  AuthorName = userInfo.Author.AuthorName,
                  AuthorPicLink = userInfo.Author.AuthorPicLink,
                  Privs = userInfo.Privs,
@@ -89,7 +89,7 @@ namespace BlackWhiteBlog.Controllers.Users
         }
 
         // PUT: api/Users/Login/5
-        [HttpPut("{id}", Name = "Login")]
+        [HttpPut("login/{id}", Name="Login")]
         public async Task<IActionResult> Login(int id, [FromBody] LoginDto value)
         {
             if (value is null)
@@ -98,6 +98,20 @@ namespace BlackWhiteBlog.Controllers.Users
             try
             {
                 var result = await _userService.Login(value);
+                if (result == null)
+                    return BadRequest("Не удается авторизовать пользователя");
+
+                //почему просто с поиском автора не работало?
+                var authorInfo = await _ctx.Users
+                    .Include(u => u.Author)
+                    .FirstOrDefaultAsync(u => u.UserId == result.UserId);
+                if (authorInfo?.Author != null)
+                {
+                    result.AuthorId = authorInfo.Author.AuthorId;
+                    result.AuthorName = authorInfo.Author.AuthorName;
+                    result.AuthorImageLink = authorInfo.Author.AuthorPicLink;
+                }
+                
                 return Ok(result);
             }
             catch(Exception e)
@@ -136,6 +150,10 @@ namespace BlackWhiteBlog.Controllers.Users
 
             var currentUser = await _ctx.Users
                 .FirstOrDefaultAsync(u => u.UserId == value.UserId);
+            
+            if (currentUser == null)
+                return "Невозможно определить права для текущего пользователя";
+            
             if (currentUser.Privs < (int) UserPermission.ManageUsers)
                 return "Недостаточно прав для редактирования пользователей";
 

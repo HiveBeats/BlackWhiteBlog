@@ -2,6 +2,7 @@ namespace BlackWhiteBlog.DbModels
 {
     public class PostContent
     {
+        public int PostContentId { get; set; }
         public int PostId { get; set; }
         public Post Post { get; set; }
         

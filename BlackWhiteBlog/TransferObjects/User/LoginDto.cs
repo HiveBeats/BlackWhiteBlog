@@ -21,11 +21,16 @@ namespace BlackWhiteBlog.TransferObjects.User
                 UserName = dto.UserName,
                 UserPassword = dto.Password
             };
+            LoginDto = loginDto;
         }
 
         public LoginDto LoginDto { get; private set; }
         
         public int UserId { get; set; }
+        
+        public int AuthorId { get; set; }
+        public string AuthorName { get; set; }
+        public string AuthorImageLink { get; set; }
 
         public  UserLoginDto WithoutPassword()
         {

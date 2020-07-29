@@ -1,0 +1,42 @@
+[UserRequestDto]
+{
+  "userId": null,
+  "authorId": null
+}
+
+[RegisterUserDto]
+{
+  "userName": null,
+  "password": null,
+  "userPermissions": 0,
+  "authorName": null
+}
+
+[EditUserDto]
+{
+  "editedUserName": null,
+  "editedUserPrivs": 0,
+  "userId": null,
+  "authorId": null
+}
+
+[LoginDto]
+{
+  "userName": null,
+  "userPassword": null,
+  "token": null
+}
+
+[UserLoginDto]
+{
+    "UserId": 0,
+    "AuthorId": 0,
+    "AuthorName": null,
+    "AuthorImageLink": null
+    "LoginDto": 
+    {
+        "userName": null,
+        "userPassword": null,
+        "token": null
+    }
+}

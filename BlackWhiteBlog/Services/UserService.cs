@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BlackWhiteBlog.DbModels;
+using BlackWhiteBlog.Helpers.Permissions;
 using BlackWhiteBlog.TransferObjects;
 using BlackWhiteBlog.TransferObjects.User;
 using Microsoft.EntityFrameworkCore;
@@ -58,23 +59,24 @@ namespace BlackWhiteBlog.Services
             //set_hashing_password
             var hashedPass = LoginService.HashPassword(userDto.Password);
 
-            //create user
-            var user = new User()
-            {
-                UserName = userDto.UserName,
-                HashedPassword = hashedPass,
-                Privs = userDto.UserPermissions
-            };
-            
-            await _ctx.Users.AddAsync(user);
-            await _ctx.SaveChangesAsync();
-            //create author
             var author = new Author()
             {
                 AuthorName = userDto.AuthorName
             };
             await _ctx.Authors.AddAsync(author);
-            user.Author = author;
+            //create user
+            var user = new User()
+            {
+                UserName = userDto.UserName,
+                HashedPassword = hashedPass,
+                //если права не были указаны изначально,указываем минимальные 
+                Privs = userDto.UserPermissions ?? (int)UserPermission.AddPost,
+                Author = author
+            };
+            
+            await _ctx.Users.AddAsync(user);
+            //create author
+           
             //save changes in db
             await _ctx.SaveChangesAsync();
 
