@@ -89,7 +89,6 @@ namespace BlackWhiteBlog.Controllers.Users
         }
 
         // PUT: api/Users/Login/5
-        //[Route("user/login/{id}")]
         [HttpPut("login/{id}", Name="Login")]
         public async Task<IActionResult> Login(int id, [FromBody] LoginDto value)
         {
