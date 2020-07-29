@@ -29,7 +29,10 @@
 
 [UserLoginDto]
 {
-    "UserId": null,
+    "UserId": 0,
+    "AuthorId": 0,
+    "AuthorName": null,
+    "AuthorImageLink": null
     "LoginDto": 
     {
         "userName": null,
