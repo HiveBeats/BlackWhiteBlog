@@ -101,6 +101,18 @@ namespace BlackWhiteBlog.Controllers.Users
                 var result = await _userService.Login(value);
                 if (result == null)
                     return BadRequest("Не удается авторизовать пользователя");
+
+                //почему просто с поиском автора не работало?
+                var authorInfo = await _ctx.Users
+                    .Include(u => u.Author)
+                    .FirstOrDefaultAsync(u => u.UserId == result.UserId);
+                if (authorInfo?.Author != null)
+                {
+                    result.AuthorId = authorInfo.Author.AuthorId;
+                    result.AuthorName = authorInfo.Author.AuthorName;
+                    result.AuthorImageLink = authorInfo.Author.AuthorPicLink;
+                }
+                
                 return Ok(result);
             }
             catch(Exception e)
