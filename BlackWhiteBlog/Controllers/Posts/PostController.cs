@@ -23,18 +23,18 @@ namespace BlackWhiteBlog.Controllers.Posts
         }
         // GET: api/Posts
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] GetPostsDto filter)
+        public async Task<IActionResult> Get([FromBody] GetPostsDto filter)
         {
             var result = new List<PostCardDto>();
             
             var posts = await _ctx.Posts.OrderByDescending(x => x.PostDate)
-                .Include(x => x.PostContents
-                    .Where(pc => pc.PostColor == filter.PostColor))
-                .GetPaged(filter.CurrentPage, filter.PageSize);
+                                                    .GetPaged(filter.CurrentPage, filter.PageSize);
             
             foreach (var post in posts.Results)
             {
-                var postContent = post.PostContents.FirstOrDefault();
+                var postContent = await _ctx.PostContents
+                    .FirstOrDefaultAsync(x => x.PostId == post.PostId && x.PostColor == filter.PostColor);
+                
                 if (postContent == null)
                     continue;
                 
@@ -76,13 +76,15 @@ namespace BlackWhiteBlog.Controllers.Posts
         {
             var post = await _ctx.Posts
                 .Include(x => x.Author)
-                .Include(x => x.PostContents
-                    .Where(pc => pc.PostColor == color))
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.PostId == id);
             if (post == null)
                 return NotFound();
             
-            var postContent = post.PostContents?.FirstOrDefault();
+            var postContent = await _ctx.PostContents
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.PostId == post.PostId && x.PostColor == color);
+            
             var result = new FullPostDto()
             {
                 PostId = post.PostId,
