@@ -17,6 +17,7 @@ namespace BlackWhiteBlog.Controllers.Posts
     public class PostController : ControllerBase
     {
         private readonly BlogDbContext _ctx;
+        private const int PreviewLength = 140;
         public PostController(BlogDbContext ctx)
         {
             _ctx = ctx;
@@ -42,6 +43,9 @@ namespace BlackWhiteBlog.Controllers.Posts
                     continue;
                 
                 var content = await GetTextFromHtml(postContent.Content);
+                if (content?.Length > PreviewLength)
+                    content = content.Substring(0, PreviewLength);
+                
                 var dto = new PostCardDto()
                 {
                     Title = postContent.Title,
@@ -70,7 +74,7 @@ namespace BlackWhiteBlog.Controllers.Posts
 
             //Just get the DOM representation
             var document = await context.OpenAsync(req => req.Content(html));
-            return document.TextContent;
+            return document.Body.ChildNodes.FirstOrDefault()?.TextContent;
         }
         
         // GET: api/Posts/5/1
