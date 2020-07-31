@@ -17,28 +17,37 @@ namespace BlackWhiteBlog.Controllers.Posts
     public class PostController : ControllerBase
     {
         private readonly BlogDbContext _ctx;
+        private const int PreviewLength = 140;
         public PostController(BlogDbContext ctx)
         {
             _ctx = ctx;
         }
         // GET: api/Posts
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] GetPostsDto filter)
+        public async Task<IActionResult> Get([FromBody] GetPostsDto filter)
         {
+            if (filter == null || filter.CurrentPage < 0 || filter.PageSize < 1)
+                return BadRequest("Запрос не является корректным");
+            
             var result = new List<PostCardDto>();
             
             var posts = await _ctx.Posts.OrderByDescending(x => x.PostDate)
-                .Include(x => x.PostContents
-                    .Where(pc => pc.PostColor == filter.PostColor))
-                .GetPaged(filter.CurrentPage, filter.PageSize);
+                                                    .GetPaged(filter.CurrentPage, filter.PageSize);
             
             foreach (var post in posts.Results)
             {
-                var postContent = post.PostContents.FirstOrDefault();
+                var postContent = await _ctx.PostContents
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.PostId == post.PostId 
+                                              && x.PostColor == filter.PostColor);
+                
                 if (postContent == null)
                     continue;
                 
                 var content = await GetTextFromHtml(postContent.Content);
+                if (content?.Length > PreviewLength)
+                    content = content.Substring(0, PreviewLength);
+                
                 var dto = new PostCardDto()
                 {
                     Title = postContent.Title,
@@ -67,7 +76,7 @@ namespace BlackWhiteBlog.Controllers.Posts
 
             //Just get the DOM representation
             var document = await context.OpenAsync(req => req.Content(html));
-            return document.TextContent;
+            return document.Body.ChildNodes.FirstOrDefault()?.TextContent;
         }
         
         // GET: api/Posts/5/1
@@ -76,13 +85,15 @@ namespace BlackWhiteBlog.Controllers.Posts
         {
             var post = await _ctx.Posts
                 .Include(x => x.Author)
-                .Include(x => x.PostContents
-                    .Where(pc => pc.PostColor == color))
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.PostId == id);
             if (post == null)
                 return NotFound();
             
-            var postContent = post.PostContents?.FirstOrDefault();
+            var postContent = await _ctx.PostContents
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.PostId == post.PostId && x.PostColor == color);
+            
             var result = new FullPostDto()
             {
                 PostId = post.PostId,
@@ -112,6 +123,12 @@ namespace BlackWhiteBlog.Controllers.Posts
                 .FirstOrDefaultAsync(x => x.AuthorId == value.AuthorId);
             if (author == null)
                 return BadRequest("Ошибка: автор не зарегистрирован");
+
+            var allContentsGiven = value.Contents.Any(x => x.Color == 0) 
+                                   && value.Contents.Any(x => x.Color == 1);
+
+            if (!allContentsGiven)
+                return BadRequest("Нельзя создать пост с контентом одной стороны");
             
             //создание поста
             var post = new Post()
