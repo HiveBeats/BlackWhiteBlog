@@ -25,6 +25,9 @@ namespace BlackWhiteBlog.Controllers.Posts
         [HttpGet]
         public async Task<IActionResult> Get([FromBody] GetPostsDto filter)
         {
+            if (filter == null || filter.CurrentPage < 0 || filter.PageSize < 1)
+                return BadRequest("Запрос не является корректным");
+            
             var result = new List<PostCardDto>();
             
             var posts = await _ctx.Posts.OrderByDescending(x => x.PostDate)
@@ -114,6 +117,12 @@ namespace BlackWhiteBlog.Controllers.Posts
                 .FirstOrDefaultAsync(x => x.AuthorId == value.AuthorId);
             if (author == null)
                 return BadRequest("Ошибка: автор не зарегистрирован");
+
+            var allContentsGiven = value.Contents.Any(x => x.Color == 0) 
+                                   && value.Contents.Any(x => x.Color == 1);
+
+            if (!allContentsGiven)
+                return BadRequest("Нельзя создать пост с контентом одной стороны");
             
             //создание поста
             var post = new Post()
