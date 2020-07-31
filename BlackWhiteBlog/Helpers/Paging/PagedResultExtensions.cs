@@ -20,7 +20,7 @@ namespace BlackWhiteBlog.Helpers.Paging
             result.PageCount = (int)Math.Ceiling(pageCount);
  
             var skip = (page - 1) * pageSize;     
-            result.Results = await query.Skip(skip).Take(pageSize).ToListAsync();
+            result.Results = await query.Skip(skip).Take(pageSize).AsNoTracking().ToListAsync();
  
             return result;
         }

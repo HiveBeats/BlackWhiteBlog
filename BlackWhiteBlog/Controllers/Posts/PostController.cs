@@ -37,7 +37,9 @@ namespace BlackWhiteBlog.Controllers.Posts
             foreach (var post in posts.Results)
             {
                 var postContent = await _ctx.PostContents
-                    .FirstOrDefaultAsync(x => x.PostId == post.PostId && x.PostColor == filter.PostColor);
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.PostId == post.PostId 
+                                              && x.PostColor == filter.PostColor);
                 
                 if (postContent == null)
                     continue;
