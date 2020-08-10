@@ -100,4 +100,106 @@ public class UserServiceTests : UsersTest
         }
     }
 
+    [Fact]
+    public async Task Can_Register()
+    {
+        using (var ctx = new BlogDbContext(ContextOptions))
+        {
+            var service = new UserService(ctx);
+            var registerUserDto = new RegisterUserDto()
+            {
+                UserName = "John Gandon",
+                Password = "ndt5bm#gY",
+                UserPermissions = 4,
+                AuthorName = "Ванька Встанька"
+            };
+
+            var loggedInRegisteredUser = await service.Register(registerUserDto);
+            
+            Assert.NotNull(loggedInRegisteredUser);
+            Assert.NotNull(loggedInRegisteredUser.LoginDto.Token);
+            Assert.Null(loggedInRegisteredUser.LoginDto.UserPassword);
+            Assert.Equal(registerUserDto.UserName, loggedInRegisteredUser.LoginDto.UserName);
+
+            var dbUser = await ctx.Users.FirstOrDefaultAsync(u => u.UserId == loggedInRegisteredUser.UserId);
+            Assert.NotNull(dbUser);
+            Assert.NotNull(dbUser.AuthorId);
+
+            ctx.Users.Remove(dbUser);
+            await ctx.SaveChangesAsync();
+        }
+    }
+
+    
+    [Fact]
+    public async Task Can_Registered_Login()
+    {
+        using (var ctx = new BlogDbContext(ContextOptions))
+        {
+            var service = new UserService(ctx);
+            var registerUserDto = new RegisterUserDto()
+            {
+                UserName = "John Gandon",
+                Password = "ndt5bm#gY",
+                UserPermissions = 4,
+                AuthorName = "Ванька Встанька"
+            };
+            
+            var loggedInRegisteredUser = await service.Register(registerUserDto);
+            var loginDto = new LoginDto(){UserName = registerUserDto.UserName, UserPassword = registerUserDto.Password};
+            var loggedUser = await service.Login(loginDto);
+            
+            Assert.NotNull(loggedUser);
+            Assert.NotNull(loggedUser.LoginDto.Token);
+            
+            var dbUser = await ctx.Users.FirstOrDefaultAsync(u => u.UserId == loggedUser.UserId);
+            ctx.Users.Remove(dbUser);
+            await ctx.SaveChangesAsync();
+        }
+    }
+
+    [Fact]
+    public async Task Not_Register_IfNotValid()
+    {
+        using (var ctx = new BlogDbContext(ContextOptions))
+        {
+            var service = new UserService(ctx);
+            var registerUserDto = new RegisterUserDto()
+            {
+                UserName = null,
+                Password = "ndt5bm#gY",
+                UserPermissions = 4,
+                AuthorName = "Ванька Встанька"
+            };
+
+            var notRegisteredUser = await service.Register(registerUserDto);
+            var otherNotRegisteredUser = await service.Register(null);
+            
+            Assert.Null(notRegisteredUser);
+            Assert.Null(otherNotRegisteredUser);
+        }
+    }
+    
+    [Fact]
+    public async Task Not_Register_IfExists()
+    {
+        using (var ctx = new BlogDbContext(ContextOptions))
+        {
+            var service = new UserService(ctx);
+            var existingUser = await ctx.Users.FirstOrDefaultAsync(u => u.UserId == 1);
+            var registerUserDto = new RegisterUserDto()
+            {
+                UserName = existingUser.UserName,
+                Password = "ndt5bm#gY",
+                UserPermissions = 4,
+                AuthorName = "Ваня Лалетин"
+            };
+
+            var notRegisteredUser = await service.Register(registerUserDto);
+
+            Assert.Null(notRegisteredUser);
+        }
+    }
+
+
 }
