@@ -24,7 +24,7 @@ namespace BlackWhiteBlog.Tests.Users
 
         protected DbContextOptions<BlogDbContext> ContextOptions { get; }
 
-        private void Seed()
+        protected virtual void Seed()
         {
             using (var context = new BlogDbContext(ContextOptions))
             {
@@ -174,13 +174,18 @@ namespace BlackWhiteBlog.Tests.Users
         [Fact]
         public async Task Get_Item_NotFound_IfNotExists()
         {
-             using(var ctx = new BlogDbContext(ContextOptions))
+            using(var ctx = new BlogDbContext(ContextOptions))
             {
                 var controller = new UserController(ctx, new UserService(ctx));
 
                 var actionResult = await controller.Get(4, new UserRequestDto(){UserId = 1, AuthorId = 1});
                 Assert.True(actionResult is NotFoundResult);
             }
+        }
+
+        public async Task Can_Register_User()
+        {
+
         }
     
     }
