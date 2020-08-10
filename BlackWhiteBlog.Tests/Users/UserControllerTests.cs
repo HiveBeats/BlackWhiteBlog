@@ -51,9 +51,21 @@ namespace BlackWhiteBlog.Tests.Users
                 .UseSqlite("Filename=TestUsers.db")
                 .Options)
         {
-            
+            SetMainUserHashedPassword();
         }
 
+        private void SetMainUserHashedPassword()
+        {
+            using(var ctx = new BlogDbContext(ContextOptions))
+            {
+                var user = ctx.Users.FirstOrDefault(u => u.UserId == 1);
+
+                var hashedPassword = LoginService.HashPassword("ndt5bm#gY");
+                user.HashedPassword = hashedPassword;
+                
+                ctx.SaveChanges();
+            }
+        }
 
         private User CreateTestUser(BlogDbContext ctx, int privs, int id)
         {
@@ -183,9 +195,122 @@ namespace BlackWhiteBlog.Tests.Users
             }
         }
 
+        [Fact]
         public async Task Can_Register_User()
         {
+            using(var ctx = new BlogDbContext(ContextOptions))
+            {
+                var controller = new UserController(ctx, new UserService(ctx));
+                var registerUserDto = new RegisterUserDto()
+                {
+                    UserName = "John Gandon",
+                    Password = "ndt5bm#gY",
+                    UserPermissions = 4,
+                    AuthorName = "Ванька Встанька"
+                };
 
+                var actionResult = await controller.Post(registerUserDto);
+                Assert.True(actionResult is OkObjectResult);
+                
+                var okResult = actionResult as OkObjectResult;
+                var registeredUserDto = okResult.Value as UserLoginDto;
+
+                Assert.NotNull(registeredUserDto);
+                Assert.NotNull(registeredUserDto.LoginDto.Token);
+                Assert.Null(registeredUserDto.LoginDto.UserPassword);
+                var dbUser = await ctx.Users.FirstOrDefaultAsync(u => u.UserId == registeredUserDto.UserId);
+                Assert.NotNull(dbUser);
+                Assert.True(LoginService.CheckPassword(dbUser.HashedPassword, registerUserDto.Password));
+                Assert.Equal(dbUser.Privs, registerUserDto.UserPermissions);
+                ctx.Users.Remove(dbUser);
+                await ctx.SaveChangesAsync();
+            }
+        }
+
+        [Fact]
+        public async Task Register_BadRequest_IfCantRegisterUser()
+        {
+            using(var ctx = new BlogDbContext(ContextOptions))
+            {
+                var controller = new UserController(ctx, new UserService(ctx));
+                var existingUserDto = new RegisterUserDto()
+                {
+                    UserName = "John Grave",
+                    Password = "ndt5bm#gY",
+                    UserPermissions = 4,
+                    AuthorName = "Ванька Встанька"
+                };
+
+                var userExistsResult = await controller.Post(existingUserDto);
+                var invalidResult = await controller.Post(null);
+                var invalidInputResult = await controller.Post(new RegisterUserDto() {UserName = null, Password = "null"});
+                var invalidInputResult2 = await controller.Post(new RegisterUserDto() {UserName = "null", Password = null});
+                                               
+                Assert.True(userExistsResult is BadRequestObjectResult);
+                Assert.True(invalidResult is BadRequestObjectResult);
+                Assert.True(invalidInputResult is BadRequestObjectResult);
+                Assert.True(invalidInputResult2 is BadRequestObjectResult);
+            }
+        }
+
+        [Fact]
+        public async Task Can_Login_User()
+        {
+            using(var ctx = new BlogDbContext(ContextOptions))
+            {
+                var controller = new UserController(ctx, new UserService(ctx));
+                var user = new LoginDto {UserName = "John Grave", UserPassword = "ndt5bm#gY"};
+                
+                var actionResult = await controller.Login(1, user);
+                Assert.True(actionResult is OkObjectResult);
+                
+                var objectResult = actionResult as OkObjectResult;
+                var loggedUser = objectResult.Value as UserLoginDto;
+                Assert.NotNull(loggedUser);    
+                
+                var dbUser = await ctx.Users.FirstOrDefaultAsync(u => u.UserId == loggedUser.UserId);
+            
+                Assert.NotNull(loggedUser);
+                Assert.NotNull(loggedUser.LoginDto.Token);
+                Assert.Equal(dbUser.Token, loggedUser.LoginDto.Token);
+                Assert.Null(loggedUser.LoginDto.UserPassword);
+                Assert.Equal(user.UserName, loggedUser.LoginDto.UserName);
+            }
+        }
+
+        [Fact]
+        public async Task Login_BadRequest_IfNotValid()
+        {
+            using(var ctx = new BlogDbContext(ContextOptions))
+            {
+                var controller = new UserController(ctx, new UserService(ctx));
+                
+                var actionResult = await controller.Login(1, null);
+                Assert.True(actionResult is BadRequestObjectResult);
+                
+                actionResult = await controller.Login(1, new LoginDto() {UserName = "John Grave", UserPassword = null});
+                Assert.True(actionResult is BadRequestObjectResult);
+
+                actionResult = await controller.Login(1, new LoginDto(){UserName = null, UserPassword = "ndt5bm#gY"});
+                Assert.True(actionResult is BadRequestObjectResult);                
+            }
+        }
+
+        [Fact]
+        public async Task Login_BadRequest_IfCant()
+        {
+            using(var ctx = new BlogDbContext(ContextOptions))
+            {
+                var controller = new UserController(ctx, new UserService(ctx));
+                
+                //bad login
+                var actionResult = await controller.Login(1, new LoginDto() {UserName = "John Gravez", UserPassword = "ndt5bm#gY"});
+                Assert.True(actionResult is BadRequestObjectResult);
+
+                //bad password
+                actionResult = await controller.Login(1, new LoginDto() {UserName = "John Grave", UserPassword = "ndt5bm#gF"});
+                Assert.True(actionResult is BadRequestObjectResult);
+            }
         }
     
     }

@@ -9,6 +9,7 @@ using BlackWhiteBlog.Services;
 using BlackWhiteBlog.TransferObjects;
 using BlackWhiteBlog.TransferObjects.User;
 using Microsoft.EntityFrameworkCore;
+using BlackWhiteBlog.Helpers.Permissions;
 
 public class UserServiceTests : UsersTest
 {
@@ -20,7 +21,7 @@ public class UserServiceTests : UsersTest
         SetMainUserHashedPassword();
     }
 
-    public void SetMainUserHashedPassword()
+    private void SetMainUserHashedPassword()
     {
         using(var ctx = new BlogDbContext(ContextOptions))
         {
@@ -120,10 +121,37 @@ public class UserServiceTests : UsersTest
             Assert.NotNull(loggedInRegisteredUser.LoginDto.Token);
             Assert.Null(loggedInRegisteredUser.LoginDto.UserPassword);
             Assert.Equal(registerUserDto.UserName, loggedInRegisteredUser.LoginDto.UserName);
-
+            
             var dbUser = await ctx.Users.FirstOrDefaultAsync(u => u.UserId == loggedInRegisteredUser.UserId);
             Assert.NotNull(dbUser);
             Assert.NotNull(dbUser.AuthorId);
+            Assert.Equal(registerUserDto.UserPermissions, dbUser.Privs);
+
+            ctx.Users.Remove(dbUser);
+            await ctx.SaveChangesAsync();
+        }
+    }
+
+    [Fact]
+    public async Task Can_Register_With_DefaultPermissions()
+    {
+         using (var ctx = new BlogDbContext(ContextOptions))
+        {
+            var service = new UserService(ctx);
+            var registerUserDto = new RegisterUserDto()
+            {
+                UserName = "John Gandon",
+                Password = "ndt5bm#gY",
+                AuthorName = "Ванька Встанька"
+            };
+
+            var loggedInRegisteredUser = await service.Register(registerUserDto);          
+            Assert.NotNull(loggedInRegisteredUser);
+            
+            var dbUser = await ctx.Users.FirstOrDefaultAsync(u => u.UserId == loggedInRegisteredUser.UserId);
+            Assert.NotNull(dbUser);
+
+            Assert.Equal((int)UserPermission.AddPost, dbUser.Privs);
 
             ctx.Users.Remove(dbUser);
             await ctx.SaveChangesAsync();
@@ -200,6 +228,4 @@ public class UserServiceTests : UsersTest
             Assert.Null(notRegisteredUser);
         }
     }
-
-
 }
