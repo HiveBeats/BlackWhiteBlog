@@ -312,6 +312,145 @@ namespace BlackWhiteBlog.Tests.Users
                 Assert.True(actionResult is BadRequestObjectResult);
             }
         }
-    
+
+        private async Task<IActionResult> EditUser(UserController controller, int editorId, int itemId, string newName, int newPriv)
+        {
+            var editedUserDto = new EditUserDto()
+            {
+                UserId  = editorId,
+                EditedUserName= newName,
+                EditedUserPrivs = newPriv
+            };
+
+            var result = await controller.Put(itemId, editedUserDto);
+            return result;
+        }
+
+        [Fact]
+        public async Task Can_Edit_User()
+        {
+            using(var ctx = new BlogDbContext(ContextOptions))
+            {
+                var controller = new UserController(ctx, new UserService(ctx));
+                var itemId = 1;
+                var newName = "JohnGrave2";
+                var newPriv = 2;
+                var actionResult = await EditUser(controller, 1, itemId, newName, newPriv);
+                Assert.NotNull(actionResult);
+                Assert.True(actionResult is OkResult);
+                
+                var editedUser = await ctx.Users.FirstOrDefaultAsync(u => u.UserName == newName);
+                Assert.NotNull(editedUser);
+                Assert.Equal(itemId, editedUser.UserId);
+                Assert.Equal(newPriv, editedUser.Privs);
+                
+                //вернем изменения
+                editedUser.UserName = "John Grave";
+                editedUser.Privs = 4;
+                await ctx.SaveChangesAsync();
+            }
+        }
+
+        [Fact]
+        public async Task Can_Login_AfterEdit()
+        {
+            using(var ctx = new BlogDbContext(ContextOptions))
+            {
+                var controller = new UserController(ctx, new UserService(ctx));
+                var itemId = 1;
+                var newName = "JohnGrave2";
+                var actionResult = await EditUser(controller, 1, itemId, newName, 2);
+                Assert.NotNull(actionResult);
+                Assert.True(actionResult is OkResult);
+
+                var loginResult = await controller.Login(1, new LoginDto() {UserName = newName, UserPassword = "ndt5bm#gY"});
+                Assert.NotNull(loginResult);
+                Assert.True(loginResult is OkObjectResult);
+                var loggedUser = (loginResult as OkObjectResult).Value as UserLoginDto;
+                Assert.NotNull(loggedUser);    
+                
+                //вернем изменения
+                var editedUser = await ctx.Users.FirstOrDefaultAsync(u => u.UserName == newName);
+                editedUser.UserName = "John Grave";
+                editedUser.Privs = 4;
+                await ctx.SaveChangesAsync();
+            }
+        }
+
+        [Fact]
+        public async Task UserEdit_BadRequest_IfNotFound()
+        {
+            using(var ctx = new BlogDbContext(ContextOptions))
+            {
+                var controller = new UserController(ctx, new UserService(ctx));
+                var itemId = 25;
+                var newName = "JohnGrave2";
+                var actionResult = await EditUser(controller, 1, itemId, newName, 2);
+                Assert.NotNull(actionResult);
+                Assert.True(actionResult is BadRequestObjectResult);
+            }
+        }
+
+        [Fact]
+        public async Task UserEdit_BadRequest_DeniedByPrivs()
+        {
+            using(var ctx = new BlogDbContext(ContextOptions))
+            {
+                var controller = new UserController(ctx, new UserService(ctx));
+                //уменьшаем себе права
+                var editorUser = await ctx.Users.FirstOrDefaultAsync(u => u.UserId == 1);
+                editorUser.Privs = 1;
+                await ctx.SaveChangesAsync();
+
+                var itemId = 1;
+                var newName = "JohnGrave2";
+                var actionResult = await EditUser(controller, 1, itemId, newName, 2);
+                Assert.NotNull(actionResult);
+                Assert.True(actionResult is BadRequestObjectResult);
+
+                //увеличиваем себе права до необходимых
+                editorUser.Privs = 3;
+                await ctx.SaveChangesAsync();
+
+                actionResult = await EditUser(controller, 1, itemId, newName, 2);
+                Assert.NotNull(actionResult);
+                Assert.True(actionResult is OkResult);
+            }
+        }
+
+        [Fact]
+        public async Task UserEdit_BadRequest_IfNotValid()
+        {
+            using(var ctx = new BlogDbContext(ContextOptions))
+            {
+                var controller = new UserController(ctx, new UserService(ctx));
+                var newName = "JohnGrave2";
+                var newPriv = 2;
+                var actionResult = await EditUser(controller, 1, -1, newName, newPriv);
+                Assert.NotNull(actionResult);
+                Assert.True(actionResult is BadRequestObjectResult);
+
+
+                var invalidEditedUserDto = new EditUserDto()
+                {
+                    UserId  = 1,
+                    EditedUserName = null
+                };
+                actionResult = await controller.Put(1, invalidEditedUserDto);
+                Assert.NotNull(actionResult);
+                Assert.True(actionResult is BadRequestObjectResult);
+
+                invalidEditedUserDto.UserId = null;
+                invalidEditedUserDto.EditedUserName = "John Grave";
+                invalidEditedUserDto.EditedUserPrivs = 4;
+                actionResult = await controller.Put(1, invalidEditedUserDto);
+                Assert.NotNull(actionResult);
+                Assert.True(actionResult is BadRequestObjectResult);
+
+                actionResult = await controller.Put(1, null);
+                Assert.NotNull(actionResult);
+                Assert.True(actionResult is BadRequestObjectResult);
+            }
+        }    
     }
 }
