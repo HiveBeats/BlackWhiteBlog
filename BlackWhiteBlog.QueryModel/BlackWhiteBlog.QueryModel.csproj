@@ -5,9 +5,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Author" />
-      <Folder Include="Content" />
-      <Folder Include="Post" />
+      <Folder Include="Author\Handler" />
+      <Folder Include="Author\Mapper" />
+      <Folder Include="Author\Query" />
+      <Folder Include="Content\Handler" />
+      <Folder Include="Content\Mapper" />
+      <Folder Include="Content\Query" />
+      <Folder Include="Post\Handler" />
+      <Folder Include="Post\Mapper" />
+      <Folder Include="Post\Query" />
     </ItemGroup>
 
 </Project>
