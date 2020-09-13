@@ -1,7 +1,7 @@
 namespace BlackWhiteBlog.DomainModel.Models
 {
-    public interface IEntity<TIdentity>
+    public interface IEntity<TKey>
     {
-        TIdentity Id { get; }
+        TKey Id { get; }
     }
 }

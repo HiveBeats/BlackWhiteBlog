@@ -1,6 +1,6 @@
 namespace BlackWhiteBlog.DomainModel.Models.Business
 {
-    public class Content :IEntity<int>
+    public class Content : IEntity<int>
     {
         #region ctor
         private Content()

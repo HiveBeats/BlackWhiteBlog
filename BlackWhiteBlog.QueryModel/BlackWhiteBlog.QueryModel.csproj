@@ -4,4 +4,10 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Author" />
+      <Folder Include="Content" />
+      <Folder Include="Post" />
+    </ItemGroup>
+
 </Project>
