@@ -4,4 +4,23 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Author\Commands\" />
+    <Folder Include="Author\Queries\" />
+    <Folder Include="Author\DTO\" />
+    <Folder Include="Author\EventHandlers\" />
+    <Folder Include="Author\Mappers\" />
+    <Folder Include="Content\Commands\" />
+    <Folder Include="Content\Queries\" />
+    <Folder Include="Content\DTO\" />
+    <Folder Include="Content\Event Handlers\" />
+    <Folder Include="Content\Mappers\" />
+    <Folder Include="Post\Commands\" />
+    <Folder Include="Post\Queries\" />
+    <Folder Include="Post\DTO\" />
+    <Folder Include="Events\" />
+    <Folder Include="Post\Event Handlers\" />
+    <Folder Include="Post\Mappers\" />
+  </ItemGroup>
+
 </Project>

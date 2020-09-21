@@ -5,10 +5,6 @@ VisualStudioVersion = 16.0.30330.147
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackWhiteBlog", "BlackWhiteBlog\BlackWhiteBlog.csproj", "{94090094-A8B4-453D-BEEC-068918F50056}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackWhiteBlog.QueryModel", "BlackWhiteBlog.QueryModel\BlackWhiteBlog.QueryModel.csproj", "{CF92A2C2-56D0-42B7-B119-C0DD5F0FEB61}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackWhiteBlog.CommandModel", "BlackWhiteBlog.CommandModel\BlackWhiteBlog.CommandModel.csproj", "{2B247305-1D1B-4755-AB62-107C3AE13A44}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackWhiteBlog.DomainModel", "BlackWhiteBlog.DomainModel\BlackWhiteBlog.DomainModel.csproj", "{E3412E56-963C-4F42-8D1A-BEFD4B078F7F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackWhiteBlog.Repository", "BlackWhiteBlog.Repository\BlackWhiteBlog.Repository.csproj", "{6C3DDDB1-C4A8-43AB-A4C8-205C96B57312}"
@@ -25,14 +21,6 @@ Global
 		{94090094-A8B4-453D-BEEC-068918F50056}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94090094-A8B4-453D-BEEC-068918F50056}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94090094-A8B4-453D-BEEC-068918F50056}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF92A2C2-56D0-42B7-B119-C0DD5F0FEB61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF92A2C2-56D0-42B7-B119-C0DD5F0FEB61}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF92A2C2-56D0-42B7-B119-C0DD5F0FEB61}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF92A2C2-56D0-42B7-B119-C0DD5F0FEB61}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2B247305-1D1B-4755-AB62-107C3AE13A44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2B247305-1D1B-4755-AB62-107C3AE13A44}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2B247305-1D1B-4755-AB62-107C3AE13A44}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2B247305-1D1B-4755-AB62-107C3AE13A44}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E3412E56-963C-4F42-8D1A-BEFD4B078F7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E3412E56-963C-4F42-8D1A-BEFD4B078F7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3412E56-963C-4F42-8D1A-BEFD4B078F7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
