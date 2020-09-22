@@ -39,6 +39,7 @@ namespace BlackWhiteBlog.DomainModel.Models.Business
                 DateClosed = DateTime.UtcNow;
             else DateClosed = closingDate;
         }
+
         [NotMapped]
         public bool IsClosed => DateClosed != null && DateClosed <= DateTime.UtcNow;
     }
