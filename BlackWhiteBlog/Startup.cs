@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BlackWhiteBlog.Application;
 using BlackWhiteBlog.DbModels;
 using BlackWhiteBlog.Services;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -33,6 +35,8 @@ namespace BlackWhiteBlog
             services.AddDbContext<BlogDbContext>(options =>
                 options.UseMySQL(connectionString));
             services.AddScoped<IUserService, UserService>();
+            //регистрация репозиториев через AddScoped
+            services.AddMediatR(typeof(Bootstrapper).GetType().Assembly);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
